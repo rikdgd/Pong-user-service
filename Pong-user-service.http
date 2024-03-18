@@ -1,0 +1,6 @@
+@Pong_user_service_HostAddress = http://localhost:5172
+
+GET {{Pong_user_service_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
