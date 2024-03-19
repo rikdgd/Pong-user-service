@@ -11,8 +11,11 @@ namespace Controllers;
 public class UserController : ControllerBase
 {
     [HttpGet(Name = "GetUser")]
-    public IActionResult GetTestUser()
+    public IActionResult GetTestUser(int userId)
     {
-        return Ok(new UserModel(1, "test-user", "welcome123"));
+        var database = new DBMock();
+        var userModel = database.GetUserById(userId);
+        
+        return Ok(userModel);
     }
 }
