@@ -1,10 +1,10 @@
-namespace Models;
+namespace Pong_user_service.Models;
 
 public class UserModel
 {
-    public int? _id { get; private set; }
-    public string? _name { get; private set; }
-    public string? _password { get; private set; }
+    public int? Id { get; private set; }
+    public string? Name { get; private set; }
+    public string? Password { get; private set; }
     
     
     public UserModel()
@@ -14,8 +14,8 @@ public class UserModel
     
     public UserModel(int id, string name, string password)
     {
-        _id = id;
-        _name = name;
-        _password = password;
+        Id = id;
+        Name = name;
+        Password = password;
     }
 }

@@ -1,21 +1,24 @@
-using Models;
+using Pong_user_service.Models;
 
-public class DBMock 
+
+namespace Pong_user_service;
+
+public class DbMock 
 {
     private List<UserModel> _store;
     
     
-    public DBMock()
+    public DbMock()
     {
         _store = new List<UserModel>();
     }
-    public DBMock(List<UserModel> users)
+    public DbMock(List<UserModel> users)
     {
         _store = [.. users];
     }
     
     public UserModel GetUserById(int id)
     {
-        return new UserModel(id, "Ron", "notsecure");
+        return new UserModel(id, "Ron", "welcome123");
     }
 }
