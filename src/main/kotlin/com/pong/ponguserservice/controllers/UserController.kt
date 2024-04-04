@@ -1,20 +1,29 @@
 package com.pong.ponguserservice.controllers
 
+import com.mongodb.*
 import org.springframework.web.bind.annotation.*
 import org.bson.Document
-import com.mongodb.ConnectionString
-import com.mongodb.MongoClientSettings
-import com.mongodb.ServerApi
-import com.mongodb.ServerApiVersion
 import com.mongodb.kotlin.client.coroutine.MongoClient
+import com.pong.ponguserservice.models.UserModel
 import kotlinx.coroutines.runBlocking
-
+import org.bson.types.ObjectId
 
 
 @RestController
 @RequestMapping("/api")
-class UserController {
-    val connectionString = "mongodb+srv://Rik:gJCVjXjYvVRPX1ZY@pong-dev.rv7wbli.mongodb.net/?retryWrites=true&w=majority&appName=Pong-dev"
+class UserController() {
+    private final var connectionString = ""
+    private val dbName = "development"
+    private val collectionName = "users"
+
+    init {
+        val connectionStringFromEnv = System.getenv("MONGO_CONN_STRING")
+        if (!connectionStringFromEnv.isNullOrEmpty()) {
+            this.connectionString = connectionStringFromEnv
+        } else {
+            throw IllegalStateException("Database connection string not found in environment variables")
+        }
+    }
 
     @GetMapping("/hello")
     fun hello(): String {
@@ -30,7 +39,7 @@ class UserController {
             .build()
 
         val mongoClientSettings = MongoClientSettings.builder()
-            .applyConnectionString(ConnectionString(connectionString))
+            .applyConnectionString(ConnectionString(this.connectionString))
             .serverApi(serverApi)
             .build()
 
@@ -47,5 +56,22 @@ class UserController {
         }
 
         return result
+    }
+
+    @PostMapping("/createUser")
+    suspend fun createUser() {
+        val client = MongoClient.create(this.connectionString)
+        val database = client.getDatabase(this.dbName)
+        val collection = database.getCollection<UserModel>(this.collectionName)
+
+        try {
+            val result = collection.insertOne(
+                UserModel(ObjectId(), "test-user", "welcome123")
+            )
+            println("Success! Inserted document id: " + result.insertedId)
+        } catch (e: MongoException) {
+            System.err.println("Unable to insert due to an error: $e")
+        }
+        client.close()
     }
 }
