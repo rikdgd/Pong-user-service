@@ -10,8 +10,8 @@ import org.bson.types.ObjectId
 
 
 @RestController
-@RequestMapping("/api")
-class UserController() {
+@RequestMapping("/users")
+class UserController {
     private final var connectionString = ""
     private val dbName = "development"
     private val collectionName = "users"
@@ -25,38 +25,6 @@ class UserController() {
         }
     }
 
-    @GetMapping("/hello")
-    fun hello(): String {
-        return "Hello world!"
-    }
-
-    @GetMapping("/mongo")
-    fun pingDb(): String {
-        var result: String
-
-        val serverApi = ServerApi.builder()
-            .version(ServerApiVersion.V1)
-            .build()
-
-        val mongoClientSettings = MongoClientSettings.builder()
-            .applyConnectionString(ConnectionString(this.connectionString))
-            .serverApi(serverApi)
-            .build()
-
-        try {
-            MongoClient.create(mongoClientSettings).use { mongoClient ->
-                val database = mongoClient.getDatabase("admin")
-                runBlocking {
-                    database.runCommand(Document("ping", 1))
-                }
-                result = "Pinged your deployment. You successfully connected to MongoDB!"
-            }
-        } catch (e: Exception) {
-            result = e.message.toString()
-        }
-
-        return result
-    }
 
     @PostMapping("/createUser")
     fun createUser(@RequestParam username: String, @RequestParam password: String) {
