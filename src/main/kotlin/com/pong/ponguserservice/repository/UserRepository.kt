@@ -5,6 +5,7 @@ import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import com.pong.ponguserservice.models.UserModel
+import com.pong.ponguserservice.utils.MongodbHelper
 import kotlinx.coroutines.runBlocking
 import org.bson.BsonValue
 import org.bson.types.ObjectId
@@ -33,16 +34,32 @@ class UserRepository {
     }
 
 
-    fun createUser(username: String, password: String): BsonValue? {
+    fun getUserById(): UserModel {
         val mongoTools = getMongoTools()
-        var newUserId: BsonValue? = null
+
+        runBlocking {
+            try {
+
+            } catch (ex: Exception) {
+                println("Failed to get user data by given id")
+            }
+        }
+
+        TODO()
+    }
+
+
+    fun createUser(username: String, password: String): ObjectId? {
+        val mongoTools = getMongoTools()
+        val mongodbHelper = MongodbHelper()
+        var newUserId: ObjectId? = null
 
         runBlocking {
             try {
                 val result = mongoTools.collection.insertOne(
                     UserModel(ObjectId(), username, password)
                 )
-                newUserId = result.insertedId
+                newUserId = mongodbHelper.parseBsonValueToObjectId(result.insertedId)
             } catch (e: MongoException) {
                 System.err.println("Unable to insert due to an error: $e")
             }
@@ -53,7 +70,7 @@ class UserRepository {
     }
 }
 
-private class MongoTools(
+private data class MongoTools(
     val client: MongoClient,
     val database: MongoDatabase,
     val collection: MongoCollection<UserModel>

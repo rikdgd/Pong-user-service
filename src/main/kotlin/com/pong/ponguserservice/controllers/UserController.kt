@@ -25,14 +25,8 @@ class UserController() {
     }
 
 
-    @PostMapping("/removeById")
-    fun removeUserById(@RequestParam id: ObjectId): ResponseEntity<UserModel> {
-        TODO()
-    }
-
-
     @PostMapping("/createUser")
-    fun createUser(@RequestParam username: String, @RequestParam password: String): ResponseEntity<BsonValue> {
+    fun createUser(@RequestParam username: String, @RequestParam password: String): ResponseEntity<ObjectId> {
         val newId = userRepository.createUser(username, password)
 
         if (newId == null) {
@@ -40,5 +34,17 @@ class UserController() {
         }
 
         return ResponseEntity.ok(newId)
+    }
+
+
+    @PostMapping("/editUser")
+    fun editUser(@RequestParam id: ObjectId): ResponseEntity<UserModel> {
+        TODO()
+    }
+
+
+    @PostMapping("/removeById")
+    fun removeUserById(@RequestParam id: ObjectId): ResponseEntity<UserModel> {
+        TODO()
     }
 }
