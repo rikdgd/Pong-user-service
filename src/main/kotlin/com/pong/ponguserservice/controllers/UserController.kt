@@ -17,7 +17,7 @@ class UserController() {
     private val collectionName = "users"
 
     init {
-        val connectionStringFromEnv = System.getenv("MONGO_CONN_STRING")
+        val connectionStringFromEnv = System.getenv("MONGODB_URI")
         if (!connectionStringFromEnv.isNullOrEmpty()) {
             this.connectionString = connectionStringFromEnv
         } else {

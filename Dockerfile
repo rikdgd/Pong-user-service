@@ -18,6 +18,9 @@ WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
 
+ARG MONGODB_URI
+ENV MONGODB_URI=${MONGODB_URI}
+
 EXPOSE 8080
 
 CMD ["java", "-jar", "app.jar"]
