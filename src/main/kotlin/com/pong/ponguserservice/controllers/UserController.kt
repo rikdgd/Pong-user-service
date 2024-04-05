@@ -5,44 +5,40 @@ import org.springframework.web.bind.annotation.*
 import org.bson.Document
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.pong.ponguserservice.models.UserModel
+import com.pong.ponguserservice.repository.UserRepository
 import kotlinx.coroutines.runBlocking
+import org.bson.BsonValue
 import org.bson.types.ObjectId
+import org.springframework.http.ResponseEntity
 
 
 @RestController
 @RequestMapping("/users")
-class UserController {
-    private final var connectionString = ""
-    private val dbName = "development"
-    private val collectionName = "users"
+class UserController() {
 
-    init {
-        val connectionStringFromEnv = System.getenv("MONGODB_URI")
-        if (!connectionStringFromEnv.isNullOrEmpty()) {
-            this.connectionString = connectionStringFromEnv
-        } else {
-            throw IllegalStateException("Database connection string not found in environment variables")
-        }
+    private final val userRepository: UserRepository = UserRepository()
+
+
+    @GetMapping("/getById")
+    fun getUserById(@RequestParam id: ObjectId): ResponseEntity<UserModel> {
+        TODO()
+    }
+
+
+    @PostMapping("/removeById")
+    fun removeUserById(@RequestParam id: ObjectId): ResponseEntity<UserModel> {
+        TODO()
     }
 
 
     @PostMapping("/createUser")
-    fun createUser(@RequestParam username: String, @RequestParam password: String) {
-        val client = MongoClient.create(this.connectionString)
-        val database = client.getDatabase(this.dbName)
-        val collection = database.getCollection<UserModel>(this.collectionName)
+    fun createUser(@RequestParam username: String, @RequestParam password: String): ResponseEntity<BsonValue> {
+        val newId = userRepository.createUser(username, password)
 
-        runBlocking {
-            try {
-                val result = collection.insertOne(
-                    UserModel(ObjectId(), username, password)
-                )
-                println("Success! Inserted document id: " + result.insertedId)
-            } catch (e: MongoException) {
-                System.err.println("Unable to insert due to an error: $e")
-            }
+        if (newId == null) {
+            return ResponseEntity.internalServerError().body(null)
         }
 
-        client.close()
+        return ResponseEntity.ok(newId)
     }
 }
