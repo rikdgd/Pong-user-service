@@ -59,19 +59,22 @@ class UserController() {
     }
 
     @PostMapping("/createUser")
-    suspend fun createUser() {
+    fun createUser(@RequestParam username: String, @RequestParam password: String) {
         val client = MongoClient.create(this.connectionString)
         val database = client.getDatabase(this.dbName)
         val collection = database.getCollection<UserModel>(this.collectionName)
 
-        try {
-            val result = collection.insertOne(
-                UserModel(ObjectId(), "test-user", "welcome123")
-            )
-            println("Success! Inserted document id: " + result.insertedId)
-        } catch (e: MongoException) {
-            System.err.println("Unable to insert due to an error: $e")
+        runBlocking {
+            try {
+                val result = collection.insertOne(
+                    UserModel(ObjectId(), username, password)
+                )
+                println("Success! Inserted document id: " + result.insertedId)
+            } catch (e: MongoException) {
+                System.err.println("Unable to insert due to an error: $e")
+            }
         }
+
         client.close()
     }
 }
