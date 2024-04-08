@@ -1,13 +1,14 @@
 package com.pong.ponguserservice.repository
 
 import com.mongodb.MongoException
+import com.mongodb.client.model.Filters
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import com.pong.ponguserservice.models.UserModel
 import com.pong.ponguserservice.utils.MongodbHelper
-import kotlinx.coroutines.runBlocking
-import org.bson.BsonValue
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.firstOrNull
 import org.bson.types.ObjectId
 
 class UserRepository {
@@ -34,18 +35,28 @@ class UserRepository {
     }
 
 
-    fun getUserById(): UserModel {
+    suspend fun getUserById(id: ObjectId): UserModel? {
         val mongoTools = getMongoTools()
+        var userModel: UserModel? = null
 
-        runBlocking {
-            try {
+        coroutineScope {
+            val job = launch {
+                try {
+                    val result = mongoTools.collection.find(
+                        Filters.eq(UserModel::id.name, id)
+                    ).firstOrNull()
 
-            } catch (ex: Exception) {
-                println("Failed to get user data by given id")
+                    result?.let { user ->
+                        userModel = user
+                    }
+
+                } catch (ex: Exception) {
+                    println("Failed to get user data by given id")
+                }
             }
         }
 
-        TODO()
+        return userModel
     }
 
 

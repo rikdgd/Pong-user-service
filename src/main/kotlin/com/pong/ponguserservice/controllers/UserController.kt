@@ -6,6 +6,8 @@ import org.bson.Document
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.pong.ponguserservice.models.UserModel
 import com.pong.ponguserservice.repository.UserRepository
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.bson.BsonValue
 import org.bson.types.ObjectId
@@ -20,7 +22,9 @@ class UserController() {
 
 
     @GetMapping("/getById")
-    fun getUserById(@RequestParam id: ObjectId): ResponseEntity<UserModel> {
+    suspend fun getUserById(@RequestParam id: ObjectId): ResponseEntity<UserModel> {
+        val result = userRepository.getUserById(id)
+
         TODO()
     }
 
