@@ -40,7 +40,7 @@ class UserRepository {
         var userModel: UserModel? = null
 
         coroutineScope {
-            val job = launch {
+            launch {
                 try {
                     val result = mongoTools.collection.find(
                         Filters.eq(UserModel::id.name, id)
@@ -60,20 +60,18 @@ class UserRepository {
     }
 
 
-    fun createUser(username: String, password: String): ObjectId? {
+    suspend fun createUser(username: String, password: String): ObjectId? {
         val mongoTools = getMongoTools()
         val mongodbHelper = MongodbHelper()
         var newUserId: ObjectId? = null
 
-        runBlocking {
-            try {
-                val result = mongoTools.collection.insertOne(
-                    UserModel(ObjectId(), username, password)
-                )
-                newUserId = mongodbHelper.parseBsonValueToObjectId(result.insertedId)
-            } catch (e: MongoException) {
-                System.err.println("Unable to insert due to an error: $e")
-            }
+        try {
+            val result = mongoTools.collection.insertOne(
+                UserModel(ObjectId(), username, password)
+            )
+            newUserId = mongodbHelper.parseBsonValueToObjectId(result.insertedId)
+        } catch (e: MongoException) {
+            System.err.println("Unable to insert due to an error: $e")
         }
 
         mongoTools.client.close()

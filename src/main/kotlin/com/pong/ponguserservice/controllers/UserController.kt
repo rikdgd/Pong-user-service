@@ -22,20 +22,26 @@ class UserController() {
 
 
     @GetMapping("/getById")
-    suspend fun getUserById(@RequestParam id: ObjectId): ResponseEntity<UserModel> {
-        val result = userRepository.getUserById(id)
+    fun getUserById(@RequestParam id: ObjectId): ResponseEntity<UserModel> {
+        var result: UserModel?
 
-        TODO()
+        runBlocking {
+            result = userRepository.getUserById(id)
+        }
+        result ?: return ResponseEntity.internalServerError().body(null)
+
+        return ResponseEntity.ok(result)
     }
 
 
     @PostMapping("/createUser")
     fun createUser(@RequestParam username: String, @RequestParam password: String): ResponseEntity<ObjectId> {
-        val newId = userRepository.createUser(username, password)
+        var newId: ObjectId?
 
-        if (newId == null) {
-            return ResponseEntity.internalServerError().body(null)
+        runBlocking {
+            newId = userRepository.createUser(username, password)
         }
+        newId ?: return ResponseEntity.internalServerError().body(null)
 
         return ResponseEntity.ok(newId)
     }
