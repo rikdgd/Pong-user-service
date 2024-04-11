@@ -42,13 +42,14 @@ class UserRepository {
         coroutineScope {
             launch {
                 try {
-                    val result = mongoTools.collection.find(
+                    val result = mongoTools.collection.withDocumentClass<UserModel>().find(
                         Filters.eq(UserModel::id.name, id)
                     ).firstOrNull()
 
-                    result?.let { user ->
-                        userModel = user
-                    }
+//                    result?.let { user ->
+//                        userModel = user
+//                    }
+                    userModel = result
 
                 } catch (ex: Exception) {
                     println("Failed to get user data by given id")
