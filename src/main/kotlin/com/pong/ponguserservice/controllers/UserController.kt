@@ -21,8 +21,9 @@ class UserController() {
         var result: UserModel?
 
         runBlocking {
-            result = userRepository.getUserById(ObjectId(id))
+            result = userRepository.getUserById(id)
         }
+
         result ?: return ResponseEntity.internalServerError().body(null)
 
         return ResponseEntity.ok(result)

@@ -1,15 +1,17 @@
 package com.pong.ponguserservice.repository
 
 import com.mongodb.MongoException
-import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Filters.eq
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import com.pong.ponguserservice.models.UserModel
 import com.pong.ponguserservice.utils.MongodbHelper
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
 import org.bson.types.ObjectId
+import kotlinx.coroutines.runBlocking
+
+
 
 class UserRepository {
 
@@ -26,6 +28,7 @@ class UserRepository {
         }
     }
 
+
     private fun getMongoTools(): MongoTools {
         val client = MongoClient.create(this.connectionString)
         val database = client.getDatabase(this.dbName)
@@ -35,29 +38,16 @@ class UserRepository {
     }
 
 
-    suspend fun getUserById(id: ObjectId): UserModel? {
-        val mongoTools = getMongoTools()
-        var userModel: UserModel? = null
+    suspend fun getUserById(id: String): UserModel? = runBlocking {
+        val tools = getMongoTools();
+        val objId = ObjectId(id)
 
-        coroutineScope {
-            launch {
-                try {
-                    val result = mongoTools.collection.withDocumentClass<UserModel>().find(
-                        Filters.eq(UserModel::id.name, id)
-                    ).firstOrNull()
+        val resultsFlow = tools.collection.withDocumentClass<UserModel>()
+            .find(eq("_id", objId))
+            .firstOrNull()
 
-//                    result?.let { user ->
-//                        userModel = user
-//                    }
-                    userModel = result
-
-                } catch (ex: Exception) {
-                    println("Failed to get user data by given id")
-                }
-            }
-        }
-
-        return userModel
+        tools.client.close()
+        resultsFlow
     }
 
 
