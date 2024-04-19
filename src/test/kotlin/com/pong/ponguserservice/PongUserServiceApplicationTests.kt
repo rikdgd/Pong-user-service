@@ -1,13 +1,18 @@
 package com.pong.ponguserservice
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
+import org.junit.Test;
+import org.junit.Assert.*
 
-@SpringBootTest
 class PongUserServiceApplicationTests {
 
 	@Test
-	fun contextLoads() {
+	fun addOneTest() {
+		val number = 5
+
+		assertEquals(addOne(5), 6)
 	}
 
+	private fun addOne(n: Int): Int {
+		return n + 1
+	}
 }
