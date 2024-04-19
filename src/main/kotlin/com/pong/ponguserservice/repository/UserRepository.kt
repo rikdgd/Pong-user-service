@@ -1,7 +1,10 @@
 package com.pong.ponguserservice.repository
 
 import com.mongodb.MongoException
+import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.eq
+import com.mongodb.client.model.UpdateOptions
+import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
@@ -67,6 +70,32 @@ class UserRepository {
 
         mongoTools.client.close()
         return newUserId
+    }
+
+    suspend fun updateUser(updatedUser: UserModel): Boolean {
+        val mongoTools = getMongoTools()
+        val objId = ObjectId(updatedUser.id.toString())
+
+        val query = Filters.eq("_id", objId)
+        val updates = Updates.combine(
+            Updates.set(UserModel::name.name, updatedUser.name),
+            Updates.set(UserModel::password.name, updatedUser.password),
+        )
+
+        // If the user doesn't exist yet, don't create it.
+        val options = UpdateOptions().upsert(false)
+
+        try {
+            val result = mongoTools.collection.updateOne(query, updates, options)
+            println("Modified document count: " + result.modifiedCount)
+            println("Upserted id: " + result.upsertedId) // only contains a non-null value when an upsert is performed
+            return true
+        } catch (e: MongoException) {
+            System.err.println("Unable to update due to an error: $e")
+            return false
+        } finally {
+            mongoTools.client.close()
+        }
     }
 }
 
