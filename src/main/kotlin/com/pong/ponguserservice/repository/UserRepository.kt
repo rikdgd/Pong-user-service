@@ -41,6 +41,12 @@ class UserRepository {
     }
 
 
+    /**
+     * Gets a user from the database by its ObjectId.
+     *
+     * @param id The stringified ObjectId of the user
+     * @return The UserModel if found, null if unsuccessful
+     */
     suspend fun getUserById(id: String): UserModel? = runBlocking {
         val tools = getMongoTools();
         val objId = ObjectId(id)
@@ -54,6 +60,13 @@ class UserRepository {
     }
 
 
+    /**
+     * Creates a new user in the database.
+     *
+     * @param username Username for the new user
+     * @param password Password for the new user
+     * @return The ObjectId of the new user, null if unsuccessful.
+     */
     suspend fun createUser(username: String, password: String): ObjectId? {
         val mongoTools = getMongoTools()
         val mongodbHelper = MongodbHelper()
@@ -72,6 +85,38 @@ class UserRepository {
         return newUserId
     }
 
+
+    /**
+     * Creates a new user in the database.
+     *
+     * @param user Userdata for the new user.
+     * @return The ObjectId of the new user, null if unsuccessful.
+     */
+    suspend fun createUser(user: UserModel): ObjectId? {
+        val mongoTools = getMongoTools()
+        val mongodbHelper = MongodbHelper()
+        var newUserId: ObjectId? = null
+
+        try {
+            val result = mongoTools.collection.insertOne(
+                UserModel(ObjectId(), user.name, user.password)
+            )
+            newUserId = mongodbHelper.parseBsonValueToObjectId(result.insertedId)
+        } catch (e: MongoException) {
+            System.err.println("Unable to insert due to an error: $e")
+        }
+
+        mongoTools.client.close()
+        return newUserId
+    }
+
+
+    /**
+     * Updates a user in the database with the provided UserModel.
+     *
+     * @param updatedUser UserModel with the new data
+     * @return true if the update was successful, false otherwise
+     */
     suspend fun updateUser(updatedUser: UserModel): Boolean {
         val mongoTools = getMongoTools()
         val objId = ObjectId(updatedUser.id.toString())

@@ -6,7 +6,7 @@ import org.bson.types.ObjectId
 
 
 data class UserModel(
-    @BsonId val id: ObjectId,
+    @BsonId val id: ObjectId?,
     val name: String,
     val password: String
 )
